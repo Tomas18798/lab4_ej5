@@ -100,8 +100,18 @@ public class InsertarTransaccion extends javax.swing.JFrame {
         });
 
         btnPorcentajeAlquiler.setText("Porcentaje de alquiler");
+        btnPorcentajeAlquiler.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPorcentajeAlquilerActionPerformed(evt);
+            }
+        });
 
         btnTransOficina.setText("Transacciones de oficina");
+        btnTransOficina.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTransOficinaActionPerformed(evt);
+            }
+        });
 
         btnSalir.setText("Salir");
 
@@ -205,11 +215,13 @@ public class InsertarTransaccion extends javax.swing.JFrame {
 
         String fecha = txtFecha.getText();
         int idVendedor = cboVendedor.getSelectedIndex() + 1;
+        String nombreV = cboVendedor.getItemAt(idVendedor - 1);
+        Vendedor vendedor = new Vendedor(idVendedor, nombreV);
 
         int tipoOperacion = cboTipoOperacion.getSelectedIndex();
         int tipoInmueble = cboTipoInmueble.getSelectedIndex();
         float monto = Float.valueOf(txtMonto.getText());
-        Transaccion newT = new Transaccion(fecha, idVendedor, tipoOperacion, tipoInmueble, monto);
+        Transaccion newT = new Transaccion(fecha, vendedor, tipoOperacion, tipoInmueble, monto);
 
         if (controlador.insertarTransaccion(newT) == true) {
             JOptionPane.showMessageDialog(this, "Transaccion registrada");
@@ -221,18 +233,49 @@ public class InsertarTransaccion extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnVentaMayorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVentaMayorActionPerformed
-        List<Transaccion> lista= controlador.obtenerTransacciones();
-        
-        float mayorMonto = 0f;
-        for (Transaccion transaccion : lista) {
-            if(transaccion.getMonto() > mayorMonto){
-                
-            }
-            mayorMonto = transaccion.getMonto();
-            
-            
-        }
+
+        Transaccion t = controlador.transaccionDeMayorValor();
+
+        String result = "La transaccion de mayor valor: Nº " + t.getId() + " - Monto " + t.getMonto() + " - Vendedor " + t.getVendedor().getNombreVendedor() + " - Operacion " + t.getTipoOperacion() + " - Inmueble " + t.getTipoInmueble();
+
+        JOptionPane.showMessageDialog(rootPane, result);
     }//GEN-LAST:event_btnVentaMayorActionPerformed
+
+    private void btnPorcentajeAlquilerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPorcentajeAlquilerActionPerformed
+
+        List<Transaccion> transacciones = controlador.obtenerTransacciones();
+        int cantTransacciones = 0;
+        int cantAlquiler = 0;
+
+        for (Transaccion t : transacciones) {
+            cantTransacciones++;
+            if (t.getTipoOperacion() == 0) {
+                cantAlquiler++;
+            }
+        }
+        float porcentaje = (cantAlquiler * 100) / cantTransacciones;
+
+        String result = "Del total de " + cantTransacciones + " transaciones, el %" + porcentaje + " son de Alquiler";
+
+        JOptionPane.showMessageDialog(rootPane, result);
+    }//GEN-LAST:event_btnPorcentajeAlquilerActionPerformed
+
+    private void btnTransOficinaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransOficinaActionPerformed
+        List<Transaccion> transacciones = controlador.obtenerTransacciones();
+        int cantTransacciones = 0;
+        int cantOficina = 0;
+
+        for (Transaccion t : transacciones) {
+            cantTransacciones++;
+            if (t.getTipoOperacion() == 1) {
+                cantOficina++;
+            }
+        }
+
+        String result = "Del total de " + cantTransacciones + " transaciones, "+cantOficina+" son de Oficinas";
+
+        JOptionPane.showMessageDialog(rootPane, result);
+    }//GEN-LAST:event_btnTransOficinaActionPerformed
 
     public void cargarComboV() {
         List<Vendedor> lista = controlador.obtenerVendedores();
